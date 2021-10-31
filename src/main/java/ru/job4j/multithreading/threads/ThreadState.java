@@ -2,16 +2,18 @@ package ru.job4j.multithreading.threads;
 
 public class ThreadState {
     public static void main(String[] args) {
-        //System.out.println(Thread.currentThread().getName());
         Thread first = new Thread(
-                //() -> {}
+                () -> System.out.println(Thread.currentThread().getName())
         );
-        System.out.println(first.getState());
         first.start();
-        System.out.println(Thread.currentThread().getName());
-        while (first.getState() != Thread.State.TERMINATED) {
-            System.out.println(first.getState());
+        Thread second = new Thread(
+                () -> System.out.println(Thread.currentThread().getName())
+        );
+        second.start();
+        while ((first.getState() != Thread.State.TERMINATED)
+                && (second.getState() != Thread.State.TERMINATED)) {
+            System.out.println("The threads in work.");
         }
-        System.out.println(first.getState());
+        System.out.println("The work is done.");
     }
 }
