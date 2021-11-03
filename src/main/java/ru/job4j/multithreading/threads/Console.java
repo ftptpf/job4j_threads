@@ -8,25 +8,16 @@ class ConsoleProgress implements Runnable {
     @Override
     public void run() {
         int count = 0;
+        char[] array = new char[] {'\\', '|', '/'};
         Thread.currentThread().setName("Load Thread");
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
-                System.out.print(System.lineSeparator());
-                System.out.print("Работа потока " + Thread.currentThread().getName() + " была прервана.");
-                return;
+                e.printStackTrace();
             }
-            if (count == 0) {
-                System.out.print("\r load: \\");
-                count = 1;
-            } else if (count == 1) {
-                System.out.print("\r load: |");
-                count = 2;
-            } else {
-                System.out.print("\r load: /");
-                count = 0;
-            }
+            System.out.print("\r load: " + array[count]);
+            count = (count < 2) ? (count + 1) : 0;
         }
     }
 }
