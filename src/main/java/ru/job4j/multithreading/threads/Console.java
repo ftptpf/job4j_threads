@@ -14,7 +14,7 @@ class ConsoleProgress implements Runnable {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
             System.out.print("\r load: " + array[count]);
             count = (count < 2) ? (count + 1) : 0;
