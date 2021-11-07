@@ -5,7 +5,7 @@ package ru.job4j.multithreading.threads;
  * Каждую секунду на консоли обновляется информация.
  * Вывод с обновлением в одной и тоже же строке.
  */
-public class Wget {
+public class WgetSimulation {
     public static void main(String[] args) {
         Thread thread = new Thread(
                 () -> {
