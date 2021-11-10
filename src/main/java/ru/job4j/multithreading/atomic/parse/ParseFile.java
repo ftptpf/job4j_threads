@@ -2,15 +2,14 @@ package ru.job4j.multithreading.atomic.parse;
 
 import java.io.*;
 
-public class ParseFile {
-    private File file;
+/**
+ * Парсер файла.
+ */
+public final class ParseFile {
+    private final File file;
 
-    public synchronized void setFile(File f) {
-        file = f;
-    }
-
-    public synchronized File getFile() {
-        return file;
+    public ParseFile(File file) {
+        this.file = file;
     }
 
     public String getContentWithoutUnicode() throws IOException {
