@@ -1,19 +1,18 @@
-package ru.job4j.multithreading.atomic.parse;
+package ru.job4j.multithreading.synchronization.parse;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.util.function.Predicate;
 
 /**
- * Парсер файла.
+ * Парсим файл по предикату и сохраняем в другой файл.
+ * Класс Immutable.
  */
 public final class ParseFile {
     private final File fileParse;
-    private final File fileResult;
 
-    public ParseFile(File fileParse, File fileResult) {
+    public ParseFile(File fileParse) {
         this.fileParse = fileParse;
-        this.fileResult = fileResult;
     }
 
     public String getContent(Predicate<Character> filter) throws IOException {
@@ -31,23 +30,14 @@ public final class ParseFile {
         return sb.toString();
     }
 
-
-    public void saveContent(String content) throws IOException {
-        try (BufferedWriter out = new BufferedWriter(new FileWriter(fileResult))) {
-            out.write(content);
-
-        }
-    }
-
     public static void main(String[] args) throws IOException {
-        File file = Path.of("src", "resources", "multithreading", "atomic", "parseFile1.txt").toFile();
-        File resultFile = Path.of("src", "resources", "multithreading", "atomic", "result.txt").toFile();
+        File file = Path.of("src", "resources", "multithreading", "atomic", "parseFile.txt").toFile();
+        File resultFile = Path.of("src", "resources", "multithreading", "atomic", "resultParseFile.txt").toFile();
         Predicate<Character> predicateUnicode = character -> (int) character < 128;
 
-        ParseFile parseFile = new ParseFile(file, resultFile);
+        ParseFile parseFile = new ParseFile(file);
+        SaveFile saveFile = new SaveFile(resultFile);
         String content = parseFile.getContent(predicateUnicode);
-        parseFile.saveContent(content);
+        saveFile.save(content);
     }
-
-
 }

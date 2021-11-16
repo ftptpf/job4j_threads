@@ -1,4 +1,4 @@
-package ru.job4j.multithreading.atomic.parse.sample;
+package ru.job4j.multithreading.synchronization.parse.sample;
 
 import java.io.*;
 import java.nio.file.Path;
