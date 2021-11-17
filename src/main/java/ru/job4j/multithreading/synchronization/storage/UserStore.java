@@ -7,19 +7,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- *
+ * Перевод денег с одного счета пользователя на другой.
+ * Операции атомарны. Объект монитора - потокобезопасный класс UserStore.
  */
 @ThreadSafe
 public final class UserStore {
     @GuardedBy("this")
-    private final Set<User> set = new HashSet<>();
+    private volatile Set<User> set = new HashSet<>();
 
     public synchronized boolean add(User user) {
         return set.add(user);
-    }
-
-    public synchronized boolean find(User user) {
-        return true;
     }
 
     public synchronized boolean update(User user) {

@@ -31,6 +31,7 @@ public class UserStoreTest {
         thread2.start();
         thread1.join();
         thread2.join();
-        assertThat()
+        assertThat(userFrom.toString(), is("User{id=1, amount=60}"));
+        assertThat(userTo.toString(), is("User{id=2, amount=50}"));
     }
 }
