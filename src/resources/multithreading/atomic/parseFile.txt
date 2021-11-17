@@ -1,0 +1,3 @@
+FileInputStream getContent
+12321 000 
+µµ ¥¥
