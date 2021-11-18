@@ -16,16 +16,11 @@ public final class UserStore {
     private final Map<Integer, User> map = new HashMap<>();
 
     public synchronized boolean add(User user) {
-        map.put(user.getId(), user);
-        return map.containsKey(user.getId());
+        return map.putIfAbsent(user.getId(), user) == null;
     }
 
     public synchronized boolean update(User user) {
-        boolean result = false;
-        if (map.containsKey(user.getId())) {
-            result = add(user);
-        }
-        return result;
+        return map.replace(user.getId(), user) != null;
     }
 
     public synchronized boolean delete(User user) {
@@ -36,13 +31,12 @@ public final class UserStore {
         boolean result = false;
         User userFrom = map.get(fromId);
         User userTo = map.get(toId);
-        if (((userFrom != null & userTo != null)
+        if (userFrom != null
+                && userTo != null
                 && userFrom.getId() != userTo.getId()
-                && userFrom.getAmount() >= amount)) {
+                && userFrom.getAmount() >= amount) {
             userFrom.setAmount(userFrom.getAmount() - amount);
             userTo.setAmount(userTo.getAmount() + amount);
-            update(userFrom);
-            update(userTo);
             result = true;
         }
         return result;
