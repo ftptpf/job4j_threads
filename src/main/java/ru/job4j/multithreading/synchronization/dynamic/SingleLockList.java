@@ -25,7 +25,7 @@ public class SingleLockList<T> implements Iterable<T> {
         this.list = cloneList(list);
     }
 
-    public void add(T value) {
+    public synchronized void add(T value) {
         list.add(value);
     }
 
@@ -39,10 +39,6 @@ public class SingleLockList<T> implements Iterable<T> {
     }
 
     public synchronized List<T> cloneList(List<T> tList) {
-        List<T> listClone = new ArrayList<>();
-        for (T lst : tList) {
-            listClone.add(lst);
-        }
-        return listClone;
+        return new ArrayList<>(tList);
     }
 }
