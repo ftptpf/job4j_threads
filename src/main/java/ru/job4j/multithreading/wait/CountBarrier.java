@@ -9,7 +9,7 @@ import net.jcip.annotations.ThreadSafe;
  * jobThread - выполняет работу
  * Пока параметр счетчика будет (count < total),
  * jobThread будет находиться в состоянии ожидания (wait),
- * послед выполнения условия - jobThread выполнит свою работу (выведет сообщение не экран).
+ * послед выполнения условия - jobThread выполнит свою работу.
  */
 @ThreadSafe
 public class CountBarrier {
@@ -25,7 +25,6 @@ public class CountBarrier {
     public void count() {
         synchronized (monitor) {
             count++;
-            System.out.println("Count is " + count + ",  " + Thread.currentThread().getName() + " - increase counter");
             monitor.notifyAll();
         }
     }
@@ -39,7 +38,6 @@ public class CountBarrier {
                     Thread.currentThread().interrupt();
                 }
             }
-            System.out.println("Count is " + count + " " + Thread.currentThread().getName() + " Do job after wait");
         }
     }
 
@@ -60,7 +58,6 @@ public class CountBarrier {
                     System.out.println(Thread.currentThread().getName() + " Started");
                 }, "Job Thread"
         );
-
         jobThread.start();
         counterThread.start();
     }
