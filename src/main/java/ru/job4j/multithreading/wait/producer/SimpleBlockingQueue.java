@@ -18,7 +18,7 @@ import java.util.Queue;
 public class SimpleBlockingQueue<T> {
     @GuardedBy("this")
     private final Queue<T> queue = new LinkedList<>();
-    private int limit;
+    private final int limit;
 
     public SimpleBlockingQueue(int limit) {
         this.limit = limit;
@@ -38,7 +38,7 @@ public class SimpleBlockingQueue<T> {
         queue.add(value);
     }
 
-    public T poll() {
+    public synchronized T poll() {
         while (queue.size() == 0) {
             try {
                 this.wait();
@@ -50,5 +50,13 @@ public class SimpleBlockingQueue<T> {
             this.notifyAll();
         }
         return queue.remove();
+    }
+
+    @Override
+    public synchronized String toString() {
+        return "SimpleBlockingQueue{"
+                + "queue=" + queue
+                + ", limit=" + limit
+                + '}';
     }
 }
