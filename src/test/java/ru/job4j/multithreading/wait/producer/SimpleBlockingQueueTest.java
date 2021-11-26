@@ -13,29 +13,38 @@ public class SimpleBlockingQueueTest {
     @Test
     public void testThreads() throws InterruptedException {
         final SimpleBlockingQueue<Integer> queue = new SimpleBlockingQueue<>(5);
-        final List<Integer> list = new ArrayList<>();
+        List<Integer> start = List.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+        List<Integer> finish = new ArrayList<>();
         Thread producer = new Thread(
                 () -> {
                     for (int i = 0; i < 10; i++) {
-                        queue.offer(i);
+                        try {
+                            queue.offer(i);
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
                     }
                 }, "Producer"
         );
         Thread customer = new Thread(
                 () -> {
                     for (int i = 0; i < 10; i++) {
-                        list.add(queue.poll());
+                        try {
+                            finish.add(queue.poll());
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
                     }
                 }, "Customer"
         );
         producer.start();
-        assertThat(queue.toString(), is("SimpleBlockingQueue{queue=[], limit=5}"));
-        producer.join(5000);
+        producer.join(10000);
+        assertThat(queue.toString(), is("SimpleBlockingQueue{queue=[0, 1, 2, 3, 4], limit=5}"));
         customer.start();
-        customer.join(5000);
+        customer.join();
         assertThat(queue.toString(), is("SimpleBlockingQueue{queue=[], limit=5}"));
-        assertThat(list.toString(), is("list"));
-        producer.join();
-        assertThat(queue.toString(), is("[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]"));
+        assertThat(start.toString(), is(finish.toString()));
     }
 }

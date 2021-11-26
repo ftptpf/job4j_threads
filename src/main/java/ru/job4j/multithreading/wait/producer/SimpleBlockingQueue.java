@@ -26,6 +26,7 @@ public class SimpleBlockingQueue<T> {
 
     public synchronized void offer(T value) {
         while (queue.size() == limit) {
+            System.out.println(Thread.currentThread().getName() + " see the queue is full, waiting until space is free");
             try {
                 this.wait();
             } catch (InterruptedException e) {
@@ -33,13 +34,16 @@ public class SimpleBlockingQueue<T> {
             }
         }
         if (queue.size() == 0) {
+            System.out.println(Thread.currentThread().getName() + " notify all - queue is empty");
             this.notifyAll();
         }
         queue.add(value);
+        System.out.println(Thread.currentThread().getName() + " add: " + value);
     }
 
     public synchronized T poll() {
         while (queue.size() == 0) {
+            System.out.println(Thread.currentThread().getName() + " see the queue is empty, waiting until something is put in");
             try {
                 this.wait();
             } catch (InterruptedException e) {
@@ -47,9 +51,12 @@ public class SimpleBlockingQueue<T> {
             }
         }
         if (queue.size() == limit) {
+            System.out.println(Thread.currentThread().getName() + " notify all - queue is full");
             this.notifyAll();
         }
-        return queue.remove();
+        T item = queue.remove();
+        System.out.println(Thread.currentThread().getName() + " take: " + item);
+        return item;
     }
 
     @Override
