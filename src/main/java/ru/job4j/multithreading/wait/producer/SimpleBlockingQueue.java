@@ -41,6 +41,10 @@ public class SimpleBlockingQueue<T> {
         return item;
     }
 
+    public synchronized boolean isEmpty() {
+        return queue.isEmpty();
+    }
+
     @Override
     public synchronized String toString() {
         return "SimpleBlockingQueue{"
