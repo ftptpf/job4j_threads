@@ -24,38 +24,20 @@ public class SimpleBlockingQueue<T> {
         this.limit = limit;
     }
 
-    public synchronized void offer(T value) {
+    public synchronized void offer(T value) throws InterruptedException {
         while (queue.size() == limit) {
-            System.out.println(Thread.currentThread().getName() + " see the queue is full, waiting until space is free");
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        if (queue.size() == 0) {
-            System.out.println(Thread.currentThread().getName() + " notify all - queue is empty");
-            this.notifyAll();
+            this.wait();
         }
         queue.add(value);
-        System.out.println(Thread.currentThread().getName() + " add: " + value);
+        this.notifyAll();
     }
 
-    public synchronized T poll() {
+    public synchronized T poll() throws InterruptedException {
         while (queue.size() == 0) {
-            System.out.println(Thread.currentThread().getName() + " see the queue is empty, waiting until something is put in");
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        if (queue.size() == limit) {
-            System.out.println(Thread.currentThread().getName() + " notify all - queue is full");
-            this.notifyAll();
+            this.wait();
         }
         T item = queue.remove();
-        System.out.println(Thread.currentThread().getName() + " take: " + item);
+        this.notifyAll();
         return item;
     }
 
