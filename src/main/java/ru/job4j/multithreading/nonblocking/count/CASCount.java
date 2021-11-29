@@ -20,9 +20,6 @@ public class CASCount {
     }
 
     public int get() {
-/*        if (count == 0) {
-            throw new UnsupportedOperationException("Count is not impl.");
-        }*/
         return count.get();
     }
 }
