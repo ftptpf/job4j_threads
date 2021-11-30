@@ -23,6 +23,13 @@ public class Cache {
     }
 
     public void delete(Base model) {
+        memory.remove(model.getId());
+    }
 
+    private void increment(Base model) {
+/*        int value;
+        do {
+            value = model.getVersion();
+        } while ())*/
     }
 }
