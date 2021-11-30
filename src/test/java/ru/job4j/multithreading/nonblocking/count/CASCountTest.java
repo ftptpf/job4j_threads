@@ -1,6 +1,5 @@
 package ru.job4j.multithreading.nonblocking.count;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -36,7 +35,6 @@ public class CASCountTest {
     }
 
     @Test
-    @Ignore
     public void moreThen100() throws InterruptedException {
         int steps = 120;
         CASCount counter = new CASCount();
@@ -63,5 +61,16 @@ public class CASCountTest {
         thread1.join();
         thread2.join();
         assertThat(counter.get(), is(steps * 2));
+    }
+
+    @Test
+    public void oneMainThread220() {
+        int steps = 220;
+        CASCount counter = new CASCount();
+        for (int i = 0; i < steps; i++) {
+            counter.increment();
+            System.out.println(Thread.currentThread().getName() + " " + counter.get());
+        }
+        assertThat(counter.get(), is(steps));
     }
 }
