@@ -33,4 +33,33 @@ public class CASCountTest {
         thread2.join();
         assertThat(counter.get(), is(steps * 2));
     }
+
+    @Test
+    public void moreThen100() throws InterruptedException {
+        int steps = 120;
+        CASCount counter = new CASCount();
+
+        Thread thread1 = new Thread(
+                () -> {
+                    for (int i = 0; i < steps; i++) {
+                        counter.increment();
+                        System.out.println(Thread.currentThread().getName() + " " + counter.get());
+                    }
+                }
+        );
+
+        Thread thread2 = new Thread(
+                () -> {
+                    for (int i = 0; i < steps; i++) {
+                        counter.increment();
+                        System.out.println(Thread.currentThread().getName() + " " + counter.get());
+                    }
+                }
+        );
+        thread1.start();
+        thread2.start();
+        thread1.join();
+        thread2.join();
+        assertThat(counter.get(), is(steps * 2));
+    }
 }
