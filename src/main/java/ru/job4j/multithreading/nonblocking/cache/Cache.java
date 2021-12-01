@@ -19,6 +19,16 @@ public class Cache {
     }
 
     public boolean update(Base model) {
+        memory.computeIfPresent(model.getId(), (id, value) -> {
+            if (value.getVersion() != model.getVersion()) {
+                throw new OptimisticException("version has already changed");
+            }
+            // return model;
+                }
+
+
+                );
+
         return true;
     }
 
