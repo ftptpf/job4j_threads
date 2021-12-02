@@ -19,27 +19,25 @@ public class Cache {
     }
 
     public boolean update(Base model) {
-        memory.computeIfPresent(model.getId(), (id, value) -> {
+        return memory.computeIfPresent(model.getId(), (id, value) -> {
             if (value.getVersion() != model.getVersion()) {
                 throw new OptimisticException("version has already changed");
             }
-            // return model;
+            Base newValue = new Base(model.getId(), model.getVersion() + 1);
+            newValue.setName(model.getName());
+            return newValue;
                 }
-
-
-                );
-
-        return true;
+                ) != null;
     }
 
     public void delete(Base model) {
         memory.remove(model.getId());
     }
 
-    private void increment(Base model) {
-/*        int value;
-        do {
-            value = model.getVersion();
-        } while ())*/
+    @Override
+    public String toString() {
+        return "Cache{"
+                + "memory=" + memory
+                + '}';
     }
 }
