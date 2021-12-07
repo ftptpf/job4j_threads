@@ -43,37 +43,27 @@ public class ThreadPool {
         }
     }
 
-/*    public ThreadPool() {
-        int size = Runtime.getRuntime().availableProcessors();
-        for (int i = 0; i < size; i++) {
-            Thread thread = new Thread(
-                    () -> {
-                        try {
-                            task.poll().run();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-            );
-            threads.add(thread);
-        }
-
-        for (Thread thread : threads) {
-            thread.start();
-        }
-    }*/
-
-    public void work(Runnable job) throws InterruptedException {
+    public synchronized void work(Runnable job) throws InterruptedException {
         if (isStopped) {
             throw new IllegalStateException("ThreadPool is stopped");
         }
         task.offer(job);
     }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         isStopped = true;
         for (Thread thread : threads) {
             thread.interrupt();
+        }
+    }
+
+    public synchronized void waitUntilAllTasksFinished() {
+        while (!task.isEmpty()) {
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
@@ -84,5 +74,22 @@ public class ThreadPool {
                 + ", task=" + task
                 + ", isStopped=" + isStopped
                 + '}';
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        SimpleBlockingQueue<Runnable> queue = new SimpleBlockingQueue<>(5);
+        ThreadPool threadPool = new ThreadPool(queue);
+
+        for (int i = 0; i < 10; i++) {
+            int jobNumber = i;
+            threadPool.work(
+                    () -> {
+                        System.out.println(Thread.currentThread().getName() + " make job # " + jobNumber);
+                    }
+            );
+        }
+        threadPool.waitUntilAllTasksFinished();
+        threadPool.shutdown();
+
     }
 }
