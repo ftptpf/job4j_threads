@@ -13,24 +13,24 @@ public class ThreadPoolTest {
 
     @Test
     public void test() throws InterruptedException {
-        ThreadPool threadPool = new ThreadPool();
-        Producer producer = new Producer();
-        threadPool.work(producer);
         SimpleBlockingQueue<Runnable> queue = new SimpleBlockingQueue<>(5);
+        ThreadPool threadPool = new ThreadPool(queue);
 
-        Thread thread = new Thread(
+        Thread threadSubmitTask = new Thread(
                 () -> {
                     for (int i = 0; i < 20; i++) {
                         try {
-                            queue.offer(new Producer());
-                            Thread.sleep(500);
+                            threadPool.work(new Producer());
+                            Thread.sleep(50);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }
                     }
                 }
         );
-        thread.start();
+        threadSubmitTask.start();
+        Thread.sleep(1000);
+        threadPool.shutdown();
 
 
 
@@ -43,7 +43,7 @@ public class ThreadPoolTest {
         @Override
         public void run() {
             int size = Runtime.getRuntime().availableProcessors();
-            System.out.print(Thread.currentThread().getName() + " " + IntStream.range(0, size));
+            System.out.print(Thread.currentThread().getName() + " well done !");
             System.out.println();
         }
     }
