@@ -17,30 +17,30 @@ public class ThreadPool {
     @GuardedBy("this")
     private final List<Thread> threads = new LinkedList<>();
     private final SimpleBlockingQueue<Runnable> task;
+    private final int size = Runtime.getRuntime().availableProcessors();
     private boolean isStopped = false;
 
     public ThreadPool(SimpleBlockingQueue<Runnable> task) {
         this.task = task;
-        int size = Runtime.getRuntime().availableProcessors();
-        while (!isStopped) {
-
-        }
         for (int i = 0; i < size; i++) {
-            Thread thread = new Thread(
+            threads.add(new Thread((Runnable) task));
+/*            Thread thread = new Thread(
                     () -> {
                         try {
-                            task.poll().run();
+                            Runnable runnable = task.poll();
+                            runnable.run();
+                            System.out.println("Take job " + runnable);
+
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
             );
-            threads.add(thread);
+            threads.add(thread);*/
+            System.out.println(Thread.currentThread().getName() + " add");
         }
 
-        for (Thread thread : threads) {
-            thread.start();
-        }
+        threads.forEach(Thread::start);
     }
 
     public synchronized void work(Runnable job) throws InterruptedException {
@@ -48,19 +48,22 @@ public class ThreadPool {
             throw new IllegalStateException("ThreadPool is stopped");
         }
         task.offer(job);
+        // System.out.println(Thread.currentThread().getName() + " add job" + job);
     }
 
     public synchronized void shutdown() {
         isStopped = true;
         for (Thread thread : threads) {
             thread.interrupt();
+            System.out.println(Thread.currentThread().getName() + " interrupted");
         }
     }
 
     public synchronized void waitUntilAllTasksFinished() {
         while (!task.isEmpty()) {
             try {
-                Thread.sleep(10);
+                Thread.sleep(100);
+                System.out.println(Thread.currentThread().getName() + " sleep 100 мс");
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -84,11 +87,16 @@ public class ThreadPool {
             int jobNumber = i;
             threadPool.work(
                     () -> {
-                        System.out.println(Thread.currentThread().getName() + " make job # " + jobNumber);
+                        System.out.println(Thread.currentThread().getName() + " make job № " + jobNumber);
+                        try {
+                            Thread.sleep(0);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
                     }
             );
         }
-        threadPool.waitUntilAllTasksFinished();
+        //threadPool.waitUntilAllTasksFinished();
         threadPool.shutdown();
 
     }
