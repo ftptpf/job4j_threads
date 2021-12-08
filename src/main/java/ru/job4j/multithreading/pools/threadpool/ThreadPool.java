@@ -8,96 +8,87 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Реализация thread пула, в котором можно переиспользовать Threads.
- * work (Runnable job) - этот метод добавляет задачи в блокирующую очередь tasks
- * shutdown() - этот метод завершает все запущенные задачи
+ * Реализация thread пула.
  */
 @ThreadSafe
 public class ThreadPool {
     @GuardedBy("this")
     private final List<Thread> threads = new LinkedList<>();
     private final SimpleBlockingQueue<Runnable> task;
-    private final int size = Runtime.getRuntime().availableProcessors();
-    private boolean isStopped = false;
 
     public ThreadPool(SimpleBlockingQueue<Runnable> task) {
         this.task = task;
+        int size = Runtime.getRuntime().availableProcessors();
+        System.out.println("Size is " + size);
         for (int i = 0; i < size; i++) {
-            threads.add(new Thread((Runnable) task));
-/*            Thread thread = new Thread(
+            Thread thread = new Thread(
                     () -> {
-                        try {
-                            Runnable runnable = task.poll();
-                            runnable.run();
-                            System.out.println("Take job " + runnable);
+                        while (!Thread.currentThread().isInterrupted()) {
+                            try {
+                                task.poll().run();
 
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                            }
                         }
                     }
             );
-            threads.add(thread);*/
-            System.out.println(Thread.currentThread().getName() + " add");
+            threads.add(thread);
+            System.out.println("Add " + Thread.currentThread().getName() + " thread to ThreadPool");
         }
-
         threads.forEach(Thread::start);
     }
 
+    /**
+     * Добавляет задачи в блокирующую очередь.
+     * @param job выполняемые задачи
+     * @throws InterruptedException
+     */
     public synchronized void work(Runnable job) throws InterruptedException {
-        if (isStopped) {
-            throw new IllegalStateException("ThreadPool is stopped");
-        }
         task.offer(job);
-        // System.out.println(Thread.currentThread().getName() + " add job" + job);
     }
 
+    /**
+     * Завершаем все запущенные Thread в ThreadPool .
+     */
     public synchronized void shutdown() {
-        isStopped = true;
         for (Thread thread : threads) {
             thread.interrupt();
-            System.out.println(Thread.currentThread().getName() + " interrupted");
+            System.out.println(Thread.currentThread().getName() + " thread interrupted");
         }
     }
 
+    /**
+     * Ожидаем когда опустеет очередь задач.
+     */
     public synchronized void waitUntilAllTasksFinished() {
         while (!task.isEmpty()) {
             try {
-                Thread.sleep(100);
-                System.out.println(Thread.currentThread().getName() + " sleep 100 мс");
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
     }
 
-    @Override
-    public String toString() {
-        return "ThreadPool{"
-                + "threads=" + threads
-                + ", task=" + task
-                + ", isStopped=" + isStopped
-                + '}';
-    }
-
     public static void main(String[] args) throws InterruptedException {
         SimpleBlockingQueue<Runnable> queue = new SimpleBlockingQueue<>(5);
         ThreadPool threadPool = new ThreadPool(queue);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 30; i++) {
             int jobNumber = i;
             threadPool.work(
                     () -> {
                         System.out.println(Thread.currentThread().getName() + " make job № " + jobNumber);
                         try {
-                            Thread.sleep(0);
+                            Thread.sleep(100);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }
                     }
             );
         }
-        //threadPool.waitUntilAllTasksFinished();
+        threadPool.waitUntilAllTasksFinished();
         threadPool.shutdown();
-
     }
 }
