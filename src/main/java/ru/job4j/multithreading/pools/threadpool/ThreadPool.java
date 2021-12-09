@@ -14,10 +14,9 @@ import java.util.List;
 public class ThreadPool {
     @GuardedBy("this")
     private final List<Thread> threads = new LinkedList<>();
-    private final SimpleBlockingQueue<Runnable> task;
+    private final SimpleBlockingQueue<Runnable> task = new SimpleBlockingQueue<>(5);
 
-    public ThreadPool(SimpleBlockingQueue<Runnable> task) {
-        this.task = task;
+    public ThreadPool() {
         int size = Runtime.getRuntime().availableProcessors();
         System.out.println("Size is " + size);
         for (int i = 0; i < size; i++) {
@@ -72,8 +71,7 @@ public class ThreadPool {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        SimpleBlockingQueue<Runnable> queue = new SimpleBlockingQueue<>(5);
-        ThreadPool threadPool = new ThreadPool(queue);
+        ThreadPool threadPool = new ThreadPool();
 
         for (int i = 0; i < 30; i++) {
             int jobNumber = i;
