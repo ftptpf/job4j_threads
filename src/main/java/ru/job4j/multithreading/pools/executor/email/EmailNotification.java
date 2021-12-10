@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 @ThreadSafe
 public class EmailNotification {
     @GuardedBy("this")
-    ExecutorService pool = Executors.newFixedThreadPool(
+    private final ExecutorService pool = Executors.newFixedThreadPool(
             Runtime.getRuntime().availableProcessors());
 
     /**
@@ -26,16 +26,21 @@ public class EmailNotification {
         String email = user.getEmail();
         String subject = "Notification " + username + " to email " + email;
         String body = "Add a new event to " + username;
-        pool.execute(() -> {
-            send(subject, body, email);
-        });
+        pool.execute(() -> send(subject, body, email));
     }
 
     /**
      * Закрываем пул потоков.
      */
-    public synchronized void close() {
+    public void close() {
         pool.shutdown();
+        while (!pool.isTerminated()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     /**
