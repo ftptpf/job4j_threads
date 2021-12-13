@@ -24,10 +24,11 @@ public class FindArrayIndex<V> extends RecursiveTask<Integer> {
 
     @Override
     protected Integer compute() {
-        System.out.println(Thread.currentThread());
+        System.out.println("Current thread: " + Thread.currentThread());
         int size = array.length;
         if (size <= 10) {
             for (int i = 0; i < size; i++) {
+                System.out.println("Value: " + array[i] + " index: " + i);
                 if (array[i].equals(value)) {
                     return i;
                 }
@@ -40,15 +41,22 @@ public class FindArrayIndex<V> extends RecursiveTask<Integer> {
             right.fork();
             int l = left.join();
             int r = right.join();
-            return Math.max(l, r);
+            System.out.println("size: " + size + " mid: " + mid + " left: " + l + " right: " + r + " Max: " + Math.max(l, r));
+            if (l >= 0) {
+                return l;
+            }
+            if (r >= 0) {
+                return r + l;
+            }
+            return -1;
         }
         return -1;
     }
 
     public static void main(String[] args) {
-        ForkJoinPool forkJoinPool = new ForkJoinPool();
+        ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
         Integer[] array = {2, 3, 5, 6, 8, 99, 23, 21, 45, 121, 12, 12, 56, 32, 11, 4, 58, 23, 90, 6, 77, 88, 21};
-        int result = forkJoinPool.invoke(new FindArrayIndex<>(array, 121));
+        int result = forkJoinPool.invoke(new FindArrayIndex<>(array, 77));
         System.out.println(result);
     }
 }
