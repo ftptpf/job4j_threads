@@ -45,8 +45,10 @@ public class FindArrayIndex<V> extends RecursiveTask<Integer> {
             int mid = (from + to) / 2;
             FindArrayIndex<V> left = new FindArrayIndex<>(array, value, from, mid);
             FindArrayIndex<V> right = new FindArrayIndex<>(array, value, mid + 1, to);
-            int l = left.invoke();
-            int r = right.invoke();
+            left.fork();
+            right.fork();
+            int l = left.join();
+            int r = right.join();
             return Math.max(r, l);
         }
         return -1;
