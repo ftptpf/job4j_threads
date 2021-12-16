@@ -66,6 +66,58 @@ public class CompletableFutureTrash {
         iWork();
     }
 
+    public static CompletableFuture<Void> washHands(String name) {
+        return CompletableFuture.runAsync(
+                () -> {
+                    try {
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    System.out.println(name + " , моет руки");
+                });
+    }
+
+    /**
+     * allOf() - возвращает ComputableFuture<Void>, при этом обеспечивает выполнение всех задач.
+     * Например, вы зовете всех членов семью к столу. Надо дождаться пока все помоют руки
+     * @throws Exception
+     */
+    public static void allOfExample() throws Exception {
+        CompletableFuture<Void> all = CompletableFuture.allOf(
+                washHands("Папа"), washHands("Мама"),
+                washHands("Ваня"), washHands("Боря")
+        );
+        TimeUnit.SECONDS.sleep(3);
+    }
+
+    public static CompletableFuture<String> whoWashHands(String name) {
+        return CompletableFuture.supplyAsync(
+                () -> {
+                    try {
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    return name + ", моет руки";
+                });
+    }
+
+    /**
+     * anyOf() - возвращает ComputableFuture<Object>. Результатом будет первая выполненная задача.
+     * На том же примере мы можем, например, узнать, кто сейчас моет руки.
+     * Результаты запуск от запуска будут различаться.
+     * @throws Exception
+     */
+    public static void anyOfExample() throws Exception {
+        CompletableFuture<Object> first = CompletableFuture.anyOf(
+                whoWashHands("Папа"), whoWashHands("Мама"),
+                whoWashHands("Ваня"), whoWashHands("Боря")
+        );
+        System.out.println("Кто сейчас моет руки?");
+        TimeUnit.SECONDS.sleep(1);
+        System.out.println(first.get());
+    }
 
     public static void main(String[] args) throws Exception {
         System.out.println("------BLOCK-1-runAsync()-----");
@@ -73,5 +125,11 @@ public class CompletableFutureTrash {
         TimeUnit.SECONDS.sleep(1);
         System.out.println("------BLOCK-2-thenRun()-----");
         thenRunExample();
+        TimeUnit.SECONDS.sleep(1);
+        System.out.println("------BLOCK-3-allOf()-----");
+        allOfExample();
+        TimeUnit.SECONDS.sleep(1);
+        System.out.println("------BLOCK-4-anyOf()-----");
+        anyOfExample();
     }
 }

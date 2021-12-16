@@ -110,8 +110,10 @@ public class CompletableFutureMilk {
         TimeUnit.SECONDS.sleep(1);
         System.out.println("------BLOCK-3-thenApply()-----");
         thenApplyExample();
+        TimeUnit.SECONDS.sleep(1);
         System.out.println("------BLOCK-4-thenCompose()-----");
         thenComposeExample();
+        TimeUnit.SECONDS.sleep(1);
         System.out.println("------BLOCK-5-thenCombine()-----");
         thenCombineExample();
     }
